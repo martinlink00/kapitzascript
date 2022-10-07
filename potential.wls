@@ -132,12 +132,12 @@ PD[];LogPrint["Acquiring algebraic solutions up to eps^"<>ToString[\[Epsilon]max
 
 
 For[i=1,i<\[Epsilon]max+1,i++,
-	If[i==1,Clear[\[Phi]],<<phi.mx];
 	PD[];LogPrint["Finding relevant terms at order eps^"<>ToString[i]<>".","PRG:ALG"];
 	ex = Expand[\[Omega]^2 (sinexp[i-2]-\[Rho]  * 1/(2 I) * (x-x^-1)sinexp[i-1]),Trig->False];
 	LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i]<>"-+j,j][t].","PRG:ALG"];
 	Monitor[
 		For[j=0,j<i,j++,
+			If[i==1&&j==0,Clear[\[Phi]],<<phi.mx];
 			cef = Coefficient[ex,x,i-j];
 			If[j==0,
 				solex=-1/((i-j)^2 \[Omega]^2) (cef),
@@ -146,13 +146,12 @@ For[i=1,i<\[Epsilon]max+1,i++,
 				solex=-1/((i-j)^2 \[Omega]^2) (cef- 2 I \[Omega] (i-j)D[\[Phi][i-j,j-1][t],t]-D[\[Phi][i-j,j-2][t],{t,2}])
 				];
 			];
-
 			\[Phi][i-j,j][t_] = ComplexExpand[solex];
 			\[Phi][-(i-j),j][t_] = ComplexExpand[solex\[Conjugate]];
+			DumpSave["phi.mx",\[Phi]];
+			Clear[\[Phi]];
 		];
 	,ProgressIndicator[j,{0,i-1}]];
-	DumpSave["phi.mx",\[Phi]];
-	Clear[\[Phi]];
 ];
 
 
