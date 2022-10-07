@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      5047,        146]
-NotebookOptionsPosition[      4568,        129]
-NotebookOutlinePosition[      5093,        148]
-CellTagsIndexPosition[      5050,        145]
+NotebookDataLength[      4914,        142]
+NotebookOptionsPosition[      4437,        125]
+NotebookOutlinePosition[      4960,        144]
+CellTagsIndexPosition[      4917,        141]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -32,8 +32,8 @@ Cell[BoxData[
   RowBox[{"(*", 
    RowBox[{
     RowBox[{
-    "If", " ", "initial", " ", "conditions", " ", "were", " ", "matched", " ",
-      "during", " ", "the", " ", "last", " ", "run"}], ",", " ", 
+    "If", " ", "initial", " ", "conditions", " ", "were", " ", "matched"}], 
+    ",", " ", 
     RowBox[{
     "you", " ", "can", " ", "access", " ", "the", " ", "initial", " ", 
      "conditions", " ", "via", " ", 
@@ -82,28 +82,23 @@ Cell[BoxData[
    RowBox[{
     RowBox[{"<<", "Vres.mx"}], ";", 
     RowBox[{"<<", "ini.mx"}], ";", 
-    RowBox[{"If", "[", 
-     RowBox[{"incond", ",", 
-      RowBox[{
-       RowBox[{"<<", "incond.mx"}], ";"}]}], "]"}], ";"}], "\n", 
+    RowBox[{"<<", "incond.mx"}], ";"}], "\n", 
    RowBox[{
-    RowBox[{"If", "[", 
-     RowBox[{"incond", ",", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Vexp", "[", "order_", "]"}], "[", "x_", "]"}], ":=", 
+     RowBox[{"Sum", "[", 
       RowBox[{
        RowBox[{
-        RowBox[{"Vexp", "[", "order_", "]"}], "[", "x_", "]"}], ":=", 
-       RowBox[{"Sum", "[", 
-        RowBox[{
-         RowBox[{
-          RowBox[{"\[Epsilon]", "^", 
-           RowBox[{"(", 
-            RowBox[{"2", "n"}], ")"}]}], 
-          RowBox[{"Vreslist", "[", 
-           RowBox[{"[", 
-            RowBox[{"n", "+", "1"}], "]"}], "]"}]}], ",", 
-         RowBox[{"{", 
-          RowBox[{"n", ",", "0", ",", "order"}], "}"}]}], "]"}]}]}], "]"}], 
-    ";"}], "\n", 
+        RowBox[{"\[Epsilon]", "^", 
+         RowBox[{"(", 
+          RowBox[{"2", "n"}], ")"}]}], 
+        RowBox[{"Vreslist", "[", 
+         RowBox[{"[", 
+          RowBox[{"n", "+", "1"}], "]"}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "0", ",", "order"}], "}"}]}], "]"}]}], ";"}], "\n", 
+   
    RowBox[{
     RowBox[{
      RowBox[{
@@ -124,10 +119,11 @@ Cell[BoxData[
   3.873950706812249*^9, 3.8739507415581083`*^9}, {3.873950918741208*^9, 
   3.87395091878439*^9}, {3.873973709681079*^9, 3.8739739800140257`*^9}, {
   3.873974341418994*^9, 3.8739743430941896`*^9}, {3.87397679927439*^9, 
-  3.873976817417488*^9}},
- CellLabel->"In[1]:=",ExpressionUUID->"86249f61-a790-4410-9b17-67ca1474d64f"]
+  3.873976817417488*^9}, {3.8741184247044497`*^9, 3.874118449809436*^9}, {
+  3.874118503262761*^9, 3.8741185056516943`*^9}},
+ CellLabel->"In[19]:=",ExpressionUUID->"86249f61-a790-4410-9b17-67ca1474d64f"]
 },
-WindowSize->{868.5, 1024.5},
+WindowSize->{868.5, 753.},
 WindowMargins->{{Automatic, 11.25}, {10.5, Automatic}},
 TaggingRules->{
  "WelcomeScreenSettings" -> {"FEStarting" -> False}, "TryRealOnly" -> False},
@@ -147,7 +143,7 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 4006, 107, 575, "Input",ExpressionUUID->"86249f61-a790-4410-9b17-67ca1474d64f"]
+Cell[558, 20, 3875, 103, 554, "Input",ExpressionUUID->"86249f61-a790-4410-9b17-67ca1474d64f"]
 }
 ]
 *)

@@ -1,3 +1,4 @@
+#!/usr/bin/env wolframscript
 (* ::Package:: *)
 
 (*
@@ -36,7 +37,7 @@ If[Not[DirectoryQ["exports"]],
 
 (*MISCDEF*)
 
-logfilename = DateString["ISODateTime"]<>".log";
+logfilename = "pot_"<>DateString["ISODateTime"]<>".log";
 
 LogPrint[x_,type_] := Module[{},
 	Print[x];
@@ -65,25 +66,26 @@ PD[]:=Print["-------------------------------------------------------------------
 (*INIT PRINTOUT*)
 
 PD[];
-If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for version 12.1.","ERROR"];Quit[],LogPrint["### KAPITZA SCRIPT ###","RUNNING"];LogPrint["### ACQUIRING PARAMETERS FROM COMMAND LINE INPUT ###","RUNNING"]];
+
+If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for version 12.1.","ERROR"];Quit[],LogPrint["### KAPITZA POTENTIAL SCRIPT ###","RUNNING"];LogPrint["### ACQUIRING PARAMETERS FROM COMMAND LINE INPUT ###","RUNNING"]];
+
 PD[];
+
 highestcoeffresp = Input["Input highest non-trivial correction (int): "];
 highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
-incondresp = InputString["Calculate initial conditions? (y/n): "];
-incond = If[incondresp === "n",False,If[incondresp==="y",True,LogPrint["Wrong input!","ERROR"];Quit[]]];
+
 PD[];
-esttime = ToString[N[If[incond,0.0479144*Exp[1.6494*highestcoeff],0.012759*Exp[1.80026*highestcoeff]]]];
+esttime = ToString[N[0.012759*Exp[1.80026*highestcoeff]]];
 userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the user " <>ToString[$UserName]<>".";
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
-paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>ToString[If[incond," with "," without "]]<>"inititial condition matching.";
+paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>".";
 esttimeinfo = "Estimated computation time: "<>esttime<>" s.";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
 LogPrint["### SYSTEM INFORMATION ###","RUNNING"];
 LogPrint[userinfo,"RUN:SYS"];LogPrint[versioninfo,"RUN:SYS"];LogPrint[processorinfo,"RUN:SYS"];LogPrint[memoryinfo,"RUN:SYS"];PD[];
-LogPrint["### SUMMARIZING PRMETERS OF UPCOMING CALCULATION ###"];
 LogPrint[paraminfo,"RUN:PRM"];LogPrint[esttimeinfo,"RUN:PRM"];LogPrint[loginfo,"INFORM"];LogPrint[exportinfo,"INFORM"];PD[];
 LogPrint["### NOW RUNNING SCRIPT ###","RUNNING"];PD[];
 
@@ -113,11 +115,11 @@ dercoeff = Series[\[Epsilon]^2 D[\[CapitalPhi][0],{t,2}] + Sum[If[n==0,0,e[n,t](
 sinser = Series[Sin[\[CurlyPhi][0][t]+\[Delta]],{\[Delta],0,\[Epsilon]max-1}][[3]];
 bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[Epsilon]max}];
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
-DumpSave["ini.mx",{LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl,incond}]; (*Dumping basic definitions for later usage.*)
+DumpSave["ini.mx",{LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
 
 (*Sin treatment*)
 
-LogPrint["Acquiring sin(\[Theta]) expansion.","PRG:INIT"];
+LogPrint["Acquiring sin(theta) expansion.","PRG:INIT"];
 sinexplist = Table[sinexpfunc[ee],{ee,0,\[Epsilon]max-1}]; (*Need only up to \[Epsilon]max-1, since one \[Epsilon] already on lhs.*)
 sinexp[\[Epsilon]ord_] := If[\[Epsilon]ord<0,0,sinexplist[[\[Epsilon]ord+1]]];
 dgl[\[Epsilon]ord_,nord_] := (Coefficient[Expand[dercoeff[[\[Epsilon]ord]]],x,nord]==Coefficient[Expand[\[Omega]^2 (sinexp[\[Epsilon]ord-2]-\[Rho]  * 1/(2 I) * (x-1/x)sinexp[\[Epsilon]ord-1])],x,nord]);
@@ -273,78 +275,14 @@ ClearAll["Global`*"];
 
 <<ini.mx;<<ser.mx;
 
-(*INITIAL CONDITIONS*)
-
-
-
-PD[];LogPrint["Performing matching process for initial conditions.","PROGRESS"];
-
-If[incond,
-	incontime = 
-	Timing[
-
-
-	For[m=0,m<highestcoeff+1,m++,
-		\[CurlyPhi][2m]'[t] =.;
-		For[n=0,n<\[Epsilon]max-1,n++,
-			\!\(\*SuperscriptBox[\(\[CurlyPhi][2  m]\), 
-TagBox[
-RowBox[{"(", 
-RowBox[{"2", "+", "n"}], ")"}],
-Derivative],
-MultilineFunction->None]\)[0]=D[a[2m][0],{t,n}];
-		];
-	];
-
-	LogPrint["Acquiring equations.","PRG:INC"];
-
-	<<V.mx;
-
-	\[Theta]inbef = Table[If[m==0,\[Theta]i==\[Theta]sercoeff[[2m+1]]/.x->1/.t->0,0==\[Theta]sercoeff[[2m+1]]/.x->1/.t->0],{m,0,highestcoeff}];
-	\[Omega]inbef = Table[If[m==0,\[Omega]i==\[Omega]sercoeff[[2m+1]]/.x->1/.t->0,0==\[Omega]sercoeff[[2m+1]]/.x->1/.t->0],{m,0,highestcoeff}];
-	Einser = Series[V[0][Sum[\[Epsilon]^(2m)\[CurlyPhi][2m][0],{m,0,highestcoeff}]]+1/2 (Sum[\[Epsilon]^(2m)\[CurlyPhi][2m]'[0],{m,0,highestcoeff}])^2,{\[Epsilon],0,2highestcoeff}][[3]];
-
-
-	<<phi.mx;<<a.mx;
-
-	LogPrint["Solving for varphi_i^(2m).","PRG:INC"];
-	For[m=0,m<highestcoeff+1,m++,
-		\[CurlyPhi]in[2m] = \[CurlyPhi][2m][0] = Evaluate[\[CurlyPhi][2m][0]/.Solve[\[Theta]inbef[[m+1]],\[CurlyPhi][2m][0]][[1]]];
-	];
-
-	LogPrint["Solving for omega_i^(2m).","PRG:INC"];
-	For[m=0,m<highestcoeff+1,m++,
-		\[CurlyPhi]in[2m] = Evaluate[\[CurlyPhi]in[2m]];
-		\[Omega]in[2m] = \[CurlyPhi][2m]'[0] = Evaluate[\[CurlyPhi][2m]'[0]/.Solve[\[Omega]inbef[[m+1]],\[CurlyPhi][2m]'[0]][[1]]];
-	];
-
-	LogPrint["Declaring E0.","PRG:INC"];
-	E0 = Sum[Factor[TrigReduce[Einser[[2m+1]]]]\[Epsilon]^(2m),{m,0,highestcoeff}];
-
-	DumpSave["incond.mx",{\[CurlyPhi]in,\[Omega]in,E0}];
-
-	LogPrint["Inserting E0 into V_eff.","PRG:INC"];
-	<<ini.mx;<<Veff.mx;<<incond.mx;<<V.mx;
-	LogPrint["Expanding.","PRG:INC"];
-	veffexp = Series[Veff[x],{\[Epsilon],0,2highestcoeff}];
-	Vreslist = Table[Coefficient[veffexp,\[Epsilon],2n],{n,0,highestcoeff}];
-	Vsimplist = Table[Coefficient[Expand[Veffsimple[x]],\[Epsilon],2n],{n,0,highestcoeff}];
-	DumpSave["Vres.mx",{Vreslist,Vsimplist}];
-
-
-	][[1]];
-
-	PD[];LogPrint["Initial condition matching finished. This took "<>ToString[incontime]<>" s.","INFORM"];
-	
-	,
-	
-	<<V.mx;<<Veff.mx;
-	Vsimplist = Table[Coefficient[Expand[Veffsimple[x]],\[Epsilon],2n],{n,0,highestcoeff}];
-	DumpSave["Vres.mx",Vsimplist];]
+<<V.mx;<<Veff.mx;
+Vsimplist = Table[Coefficient[Expand[Veffsimple[x]],\[Epsilon],2n],{n,0,highestcoeff}];
+DumpSave["Vres.mx",Vsimplist];
 
 ][[1]];
 
-PD[];PD[];LogPrint["Total calculation done. It took "<>ToString[total]<>" s.","INFORM"];
-LogPrint["Access solutions using Results.nb.","INFORM"];
-PD[];PD[];
-LogPrint["### CALCULATION DONE ###","RUNNING"];
+PD[];PD[];LogPrint["Potential calculation completed. It took "<>ToString[total]<>" s.","INFORM"];
+LogPrint["Access solutions using Results.nb. Match initial conditions by running incond.wls","INFORM"];
+PD[];
+LogPrint["### POTENTIAL CALCULATION DONE ###","RUNNING"];
+PD[];
