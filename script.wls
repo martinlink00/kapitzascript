@@ -27,8 +27,11 @@ Timing[
 (*INIT*)
 
 ClearSystemCache[];
-SetDirectory["exports"];
 Off[FrontEndObject::notavail];
+If[Not[DirectoryQ["exports"]],
+  Print["Creating exports directory."];CreateDirectory["exports"];SetDirectory["exports"];CreateDirectory["logs"];,
+  SetDirectory["exports"];];
+
 
 
 (*MISCDEF*)
