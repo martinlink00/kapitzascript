@@ -1,3 +1,6 @@
+#!/usr/bin/env wolframscript
+(* ::Package:: *)
+
 (*
 
 Notes for usage:
@@ -57,6 +60,8 @@ CheckRAM[] :=
 	];
 PD[]:=Print["---------------------------------------------------------------------"];
 
+AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
+
 
 (*INIT PRINTOUT*)
 
@@ -70,6 +75,8 @@ highestcoeffresp = Input["Input highest non-trivial correction (int): "];\[Rho]i
 highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
 \[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
 \[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+
+
 
 PD[];
 esttime = ToString[N[0.012759*Exp[1.80026*highestcoeff]]];
@@ -112,7 +119,6 @@ dercoeff = Series[\[Epsilon]^2 D[\[CapitalPhi][0],{t,2}] + Sum[If[n==0,0,e[n,t](
 sinser = Series[Sin[\[CurlyPhi][0][t]+\[Delta]],{\[Delta],0,\[Epsilon]max-1}][[3]];
 bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[Epsilon]max}];
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
-
 
 
 DumpSave["ini.mx",{\[Rho],\[Omega],LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
@@ -288,3 +294,4 @@ LogPrint["Access solutions using Results.nb. Match initial conditions by running
 PD[];
 LogPrint["### POTENTIAL CALCULATION DONE ###","RUNNING"];
 PD[];
+
