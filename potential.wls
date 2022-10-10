@@ -1,6 +1,3 @@
-#!/usr/bin/env wolframscript
-(* ::Package:: *)
-
 (*
 
 Notes for usage:
@@ -14,9 +11,7 @@ Notes for usage:
 
 
 
-
 (**************************************************************************)
-
 
 
 
@@ -71,8 +66,10 @@ If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for
 
 PD[];
 
-highestcoeffresp = Input["Input highest non-trivial correction (int): "];
+highestcoeffresp = Input["Input highest non-trivial correction (int): "];\[Rho]inp = Input["Input value for rho (float): "];\[Omega]inp = Input["Input value for om_0 (float): "];
 highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
+\[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+\[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
 
 PD[];
 esttime = ToString[N[0.012759*Exp[1.80026*highestcoeff]]];
@@ -80,7 +77,7 @@ userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the 
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
-paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>".";
+paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>" with params (rho,om_0) = ("<>ToString[\[Rho]]<>","<>ToString[\[Omega]]<>").";
 esttimeinfo = "Estimated computation time: "<>esttime<>" s.";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
@@ -115,7 +112,12 @@ dercoeff = Series[\[Epsilon]^2 D[\[CapitalPhi][0],{t,2}] + Sum[If[n==0,0,e[n,t](
 sinser = Series[Sin[\[CurlyPhi][0][t]+\[Delta]],{\[Delta],0,\[Epsilon]max-1}][[3]];
 bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[Epsilon]max}];
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
-DumpSave["ini.mx",{LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+
+
+
+DumpSave["ini.mx",{\[Rho],\[Omega],LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+
+Loadvalues[];
 
 (*Sin treatment*)
 
@@ -124,6 +126,7 @@ sinexplist = Table[sinexpfunc[ee],{ee,0,\[Epsilon]max-1}]; (*Need only up to \[E
 sinexp[\[Epsilon]ord_] := If[\[Epsilon]ord<0,0,sinexplist[[\[Epsilon]ord+1]]];
 dgl[\[Epsilon]ord_,nord_] := (Coefficient[Expand[dercoeff[[\[Epsilon]ord]]],x,nord]==Coefficient[Expand[\[Omega]^2 (sinexp[\[Epsilon]ord-2]-\[Rho]  * 1/(2 I) * (x-1/x)sinexp[\[Epsilon]ord-1])],x,nord]);
 Share[]; (*In hope of saving memory.*)
+
 
 
 (*Declare \[Phi][n\[NotEqual]0,m,t] solutions*)
@@ -166,6 +169,7 @@ PD[];LogPrint["All phi[n!=0,m,t] have been solved and declared. This took "<>ToS
 
 DumpSave["ser.mx",{\[Theta]sercoeff,\[Omega]sercoeff}];
 
+
 vefftime = Timing[
 
 
@@ -188,7 +192,6 @@ PD[];LogPrint["Defining and expanding effective potential.","PRG:ACC"];
 
 Veff[z_] = Sum[\[Epsilon]^(2 m) V[2m][z],{m,0,(\[Epsilon]max-3)/2}];
 veffser = Series[D[Veff[z],z]/.z->\[CapitalPhi][0]/.oddphi0repl/.newnot/.\[CurlyPhi][0][t]->x,{\[Epsilon],0,\[Epsilon]max-3}];
-
 
 PD[];LogPrint["Acquiring derivative expressions from energy conservation.","PRG:ACC"];
 
