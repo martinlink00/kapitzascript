@@ -71,26 +71,26 @@ If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for
 
 PD[];
 
-highestcoeffresp = Input["Input highest non-trivial correction (int): "];\[Rho]inp = Input["Input value for rho (float): "];\[Omega]inp = Input["Input value for om_0 (float): "];
+highestcoeffresp = Input["Input highest non-trivial correction (int): "];
+(*\[Rho]inp = Input["Input value for rho (float): "];\[Omega]inp = Input["Input value for om_0 (float): "];*)
 highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
-\[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
-\[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+(*\[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+\[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];*)
 
 
 
 PD[];
-esttime = ToString[N[0.012759*Exp[1.80026*highestcoeff]]];
 userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the user " <>ToString[$UserName]<>".";
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
-paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>" with params (rho,om_0) = ("<>ToString[\[Rho]]<>","<>ToString[\[Omega]]<>").";
-esttimeinfo = "Estimated computation time: "<>esttime<>" s.";
+paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>"."(*<>" with params (rho,om_0) = ("<>ToString[\[Rho]]<>","<>ToString[\[Omega]]<>")."*);
+esttimeinfo = "In order to estimate the time and memory that will be needed on your machine, run the script esttime.wls.";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
 LogPrint["### SYSTEM INFORMATION ###","RUNNING"];
 LogPrint[userinfo,"RUN:SYS"];LogPrint[versioninfo,"RUN:SYS"];LogPrint[processorinfo,"RUN:SYS"];LogPrint[memoryinfo,"RUN:SYS"];PD[];
-LogPrint[paraminfo,"RUN:PRM"];LogPrint[esttimeinfo,"RUN:PRM"];LogPrint[loginfo,"INFORM"];LogPrint[exportinfo,"INFORM"];PD[];
+LogPrint[paraminfo,"RUN:PRM"];LogPrint[esttimeinfo,"INFORM"];LogPrint[loginfo,"INFORM"];LogPrint[exportinfo,"INFORM"];PD[];
 LogPrint["### NOW RUNNING SCRIPT ###","RUNNING"];PD[];
 
 
@@ -121,9 +121,8 @@ bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[E
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
 
 
-DumpSave["ini.mx",{\[Rho],\[Omega],LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+DumpSave["ini.mx",{(*\[Rho],\[Omega],*)LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
 
-Loadvalues[];
 
 (*Sin treatment*)
 
