@@ -21,6 +21,9 @@ logfilename = "inc_"<>DateString["ISODateTime"]<>".log";
 If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for version 12.1.","ERROR"];Quit[],PD[];LogPrint["### INITIAL CONDITION SCRIPT ###","RUNNING"];PD[];]
 
 
+AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
+
+
 userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the user " <>ToString[$UserName]<>".";
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";

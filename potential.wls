@@ -14,9 +14,7 @@ Notes for usage:
 
 
 
-
 (**************************************************************************)
-
 
 
 
@@ -41,7 +39,7 @@ logfilename = "pot_"<>DateString["ISODateTime"]<>".log";
 
 LogPrint[x_,type_] := Module[{},
 	Print[x];
-	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[RAM: "<>ToString[N[MemoryInUse[]/MemoryAvailable[] *100,4]]<>"%]\t"<>x;
+	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[RAM: "<>ToString[N[MaxMemoryUsed[]/MemoryAvailable[] *100,4]]<>"%]\t"<>x;
 	WriteLine[FileNameJoin[{"logs",logfilename}],outp];];
 
 myByteCount[symbolName_String]:=
@@ -62,6 +60,8 @@ CheckRAM[] :=
 	];
 PD[]:=Print["---------------------------------------------------------------------"];
 
+AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
+
 
 (*INIT PRINTOUT*)
 
@@ -71,8 +71,12 @@ If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for
 
 PD[];
 
-highestcoeffresp = Input["Input highest non-trivial correction (int): "];
+highestcoeffresp = Input["Input highest non-trivial correction (int): "];\[Rho]inp = Input["Input value for rho (float): "];\[Omega]inp = Input["Input value for om_0 (float): "];
 highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
+\[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+\[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
+
+
 
 PD[];
 esttime = ToString[N[0.012759*Exp[1.80026*highestcoeff]]];
@@ -80,7 +84,7 @@ userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the 
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
-paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>".";
+paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>" with params (rho,om_0) = ("<>ToString[\[Rho]]<>","<>ToString[\[Omega]]<>").";
 esttimeinfo = "Estimated computation time: "<>esttime<>" s.";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
@@ -115,7 +119,11 @@ dercoeff = Series[\[Epsilon]^2 D[\[CapitalPhi][0],{t,2}] + Sum[If[n==0,0,e[n,t](
 sinser = Series[Sin[\[CurlyPhi][0][t]+\[Delta]],{\[Delta],0,\[Epsilon]max-1}][[3]];
 bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[Epsilon]max}];
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
-DumpSave["ini.mx",{LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+
+
+DumpSave["ini.mx",{\[Rho],\[Omega],LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+
+Loadvalues[];
 
 (*Sin treatment*)
 
@@ -126,6 +134,7 @@ dgl[\[Epsilon]ord_,nord_] := (Coefficient[Expand[dercoeff[[\[Epsilon]ord]]],x,no
 Share[]; (*In hope of saving memory.*)
 
 
+
 (*Declare \[Phi][n\[NotEqual]0,m,t] solutions*)
 
 PD[];LogPrint["Acquiring algebraic solutions up to eps^"<>ToString[\[Epsilon]max]<>".","PROGRESS"];
@@ -134,7 +143,6 @@ PD[];LogPrint["Acquiring algebraic solutions up to eps^"<>ToString[\[Epsilon]max
 For[i=1,i<\[Epsilon]max+1,i++,
 	PD[];LogPrint["Finding relevant terms at order eps^"<>ToString[i]<>".","PRG:ALG"];
 	ex = Expand[\[Omega]^2 (sinexp[i-2]-\[Rho]  * 1/(2 I) * (x-x^-1)sinexp[i-1]),Trig->False];
-	LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i]<>"-+j,j][t].","PRG:ALG"];
 	Monitor[
 		For[j=0,j<i,j++,
 			If[i==1&&j==0,Clear[\[Phi]],<<phi.mx];
@@ -146,6 +154,7 @@ For[i=1,i<\[Epsilon]max+1,i++,
 				solex=-1/((i-j)^2 \[Omega]^2) (cef- 2 I \[Omega] (i-j)D[\[Phi][i-j,j-1][t],t]-D[\[Phi][i-j,j-2][t],{t,2}])
 				];
 			];
+			LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i-j]<>","<>ToString[j]<>"][t].","PRG:ALG"];
 			\[Phi][i-j,j][t_] = ComplexExpand[solex];
 			\[Phi][-(i-j),j][t_] = ComplexExpand[solex\[Conjugate]];
 			DumpSave["phi.mx",\[Phi]];
@@ -165,6 +174,7 @@ PD[];LogPrint["All phi[n!=0,m,t] have been solved and declared. This took "<>ToS
 (*Effective potential treatment*)
 
 DumpSave["ser.mx",{\[Theta]sercoeff,\[Omega]sercoeff}];
+
 
 vefftime = Timing[
 
@@ -188,7 +198,6 @@ PD[];LogPrint["Defining and expanding effective potential.","PRG:ACC"];
 
 Veff[z_] = Sum[\[Epsilon]^(2 m) V[2m][z],{m,0,(\[Epsilon]max-3)/2}];
 veffser = Series[D[Veff[z],z]/.z->\[CapitalPhi][0]/.oddphi0repl/.newnot/.\[CurlyPhi][0][t]->x,{\[Epsilon],0,\[Epsilon]max-3}];
-
 
 PD[];LogPrint["Acquiring derivative expressions from energy conservation.","PRG:ACC"];
 
@@ -285,3 +294,4 @@ LogPrint["Access solutions using Results.nb. Match initial conditions by running
 PD[];
 LogPrint["### POTENTIAL CALCULATION DONE ###","RUNNING"];
 PD[];
+
