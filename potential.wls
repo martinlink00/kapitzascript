@@ -72,7 +72,7 @@ AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
 
 PD[];
 
-If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for version 12.1.","ERROR"];Quit[],LogPrint["### KAPITZA POTENTIAL SCRIPT ###","RUNNING"];LogPrint["### ACQUIRING PARAMETERS FROM COMMAND LINE INPUT ###","RUNNING"]];
+If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for version 12.1.","ERROR"];Quit[],LogPrint["### KAPITZA POTENTIAL SCRIPT ###","RUNNING"];LogPrint["### ACQUIRING PARAMETERS FROM PARAM FILE ###","RUNNING"]];
 
 PD[];
 
@@ -89,7 +89,7 @@ versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
 paraminfo = "Calculating up to non-trivial correction "<>ToString[highestcoeff]<>"."(*<>" with params (rho,om_0) = ("<>ToString[\[Rho]]<>","<>ToString[\[Omega]]<>")."*);
-esttimeinfo = "In order to estimate the time and memory that will be needed on your machine, run the script esttime.wls.";
+esttimeinfo = "In order to estimate the time and memory that will be needed on your machine from available logfiles, run the script paramest.wls.";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
 LogPrint["### SYSTEM INFORMATION ###","RUNNING"];
