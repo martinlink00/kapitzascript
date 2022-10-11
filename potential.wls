@@ -27,6 +27,9 @@ Timing[
 
 ClearSystemCache[];
 Off[FrontEndObject::notavail];
+
+highestcoeffresp = ReadList["params.txt"][[1]];
+
 If[Not[DirectoryQ["exports"]],
   Print["Creating exports directory."];CreateDirectory["exports"];SetDirectory["exports"];CreateDirectory["logs"];,
   SetDirectory["exports"];];
@@ -39,7 +42,9 @@ logfilename = "pot_"<>DateString["ISODateTime"]<>".log";
 
 LogPrint[x_,type_] := Module[{},
 	Print[x];
-	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[RAM: "<>ToString[N[MaxMemoryUsed[]/MemoryAvailable[] *100,4]]<>"%]\t"<>x;
+	maxm = MaxMemoryUsed[];
+	mema = MemoryAvailable[];
+	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[Maximum RAM: "<>ToString[N[maxm/(10^9),2]]<>" GB ("<>ToString[N[maxm/mema *100,2]]<>"%)]\t"<>x;
 	WriteLine[FileNameJoin[{"logs",logfilename}],outp];];
 
 myByteCount[symbolName_String]:=
@@ -71,9 +76,8 @@ If[$VersionNumber!=12.1,LogPrint["Version error: Script was developed on and for
 
 PD[];
 
-highestcoeffresp = Input["Input highest non-trivial correction (int): "];
 (*\[Rho]inp = Input["Input value for rho (float): "];\[Omega]inp = Input["Input value for om_0 (float): "];*)
-highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input!","ERROR"];Quit[]];
+highestcoeff = If[IntegerQ[highestcoeffresp],highestcoeffresp,LogPrint["Wrong input in params.txt file!","ERROR"];Quit[]];
 (*\[Rho] = If[NumberQ[\[Rho]inp],\[Rho]inp,LogPrint["Wrong input!","ERROR"];Quit[]];
 \[Omega] = If[NumberQ[\[Omega]inp],\[Omega]inp,LogPrint["Wrong input!","ERROR"];Quit[]];*)
 
