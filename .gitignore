@@ -1,5 +1,7 @@
 exports/
 
+*.pdf
+
 # Prerequisites
 *.d
 
