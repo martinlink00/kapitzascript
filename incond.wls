@@ -28,7 +28,7 @@ userinfo = "Script has been executed on "<>ToString[$OperatingSystem]<>" by the 
 versioninfo = "Running on Mathematica "<>ToString[$VersionNumber]<>".";
 processorinfo = ToString[$ProcessorCount]<>" processors of type "<>ToString[$ProcessorType]<>" available.";
 memoryinfo = ToString[N[MemoryAvailable[]/10^6]]<>" MB of memory available for allocation.";
-paraminfo = "Performing matching process for initial conditions up to non-trivial correction "<>ToString[highestcoeff]<>" .";
+paraminfo = "Performing matching process for initial conditions up to non-trivial correction "<>ToString[highestcoeff]<>".";
 exportinfo = "Results will be dumpsaved into the subfolder exports and can be accessed using Results.nb.";
 loginfo = "Log for this script execution is saved under exports/logs/"<>logfilename<>".";
 
