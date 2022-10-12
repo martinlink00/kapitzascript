@@ -42,9 +42,7 @@ logfilename = "pot_"<>DateString["ISODateTime"]<>".log";
 
 LogPrint[x_,type_] := Module[{},
 	Print[x];
-	maxm = MaxMemoryUsed[];
-	mema = MemoryAvailable[];
-	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[Maximum RAM: "<>ToString[N[maxm/(10^9),2]]<>" GB ("<>ToString[N[maxm/mema *100,2]]<>"%)]\t"<>x;
+	outp = "["<>DateString["ISODateTime"]<>"]\t["<>type<>"]\t[Maximum RAM: "<>ToString[Round[N[MaxMemoryUsed[]/(10^9) *1.0],0.01]]<>" GB ("<>ToString[Round[N[MaxMemoryUsed[]/MemoryAvailable[] *100.0],0.01]]<>"%)]\t"<>x;
 	WriteLine[FileNameJoin[{"logs",logfilename}],outp];];
 
 myByteCount[symbolName_String]:=
