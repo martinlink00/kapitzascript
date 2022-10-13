@@ -65,6 +65,7 @@ PD[]:=Print["-------------------------------------------------------------------
 
 AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
 
+MyConjugate[x_] := x /. Complex[a_, b_] :> a - I b; (*Faster conjugate for algebraic sols*)
 
 (*INIT PRINTOUT*)
 
@@ -123,7 +124,7 @@ bellargument = Table[Table[Factorial[i]\[Theta]sercoeff[[i+1]],{i,1,n}],{n,1,\[E
 sinexpfunc[epsord_] := If[epsord<0,0,If[epsord==0,Sin[\[CurlyPhi][0][t]],1/Factorial[epsord] Sum[Factorial[n]sinser[[n+1]]BellY[epsord,n,bellargument[[epsord-n+1]]],{n,1,epsord}]]];
 
 
-DumpSave["ini.mx",{(*\[Rho],\[Omega],*)LogPrint,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
+DumpSave["ini.mx",{(*\[Rho],\[Omega],*)LogPrint,MyConjugate,logfilename,\[Theta],\[Delta]\[Theta],\[CapitalPhi],\[Epsilon]max,highestcoeff,myByteCount,CheckRAM,PD,newnot,oddphi0repl}]; (*Dumping basic definitions for later usage.*)
 
 
 (*Sin treatment*)
@@ -157,7 +158,7 @@ For[i=1,i<\[Epsilon]max+1,i++,
 			];
 			LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i-j]<>","<>ToString[j]<>"][t].","PRG:ALG"];
 			\[Phi][i-j,j][t_] = ComplexExpand[solex];
-			\[Phi][-(i-j),j][t_] = ComplexExpand[solex\[Conjugate]];
+			\[Phi][-(i-j),j][t_] = ComplexExpand[Conjugate[solex]];
 			DumpSave["phi.mx",\[Phi]];
 			Clear[\[Phi]];
 		];
