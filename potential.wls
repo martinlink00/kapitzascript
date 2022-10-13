@@ -65,7 +65,7 @@ PD[]:=Print["-------------------------------------------------------------------
 
 AppendTo[$Messages,OpenWrite[FileNameJoin[{"logs",logfilename}]]];
 
-MyConjugate[x_] := x /. Complex[a_, b_] :> a - I b; (*Faster conjugate for algebraic sols*)
+MyConjugate[x_] := x /. Complex[a_, b_] :> Complex[a, -b]; (*Faster conjugate for algebraic sols*)
 
 (*INIT PRINTOUT*)
 
@@ -157,10 +157,11 @@ For[i=1,i<\[Epsilon]max+1,i++,
 				];
 			];
 			LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i-j]<>","<>ToString[j]<>"][t].","PRG:ALG"];
-			\[Phi][i-j,j][t_] = ComplexExpand[solex];
-			\[Phi][-(i-j),j][t_] = ComplexExpand[Conjugate[solex]];
+			expandedsolex = Expand[solex];
+			\[Phi][i-j,j][t_] = expandedsolex;
+			\[Phi][-(i-j),j][t_] = (-1)^((i-j)+j) expandedsolex;
 			DumpSave["phi.mx",\[Phi]];
-			Clear[\[Phi]];
+			Clear[\[Phi],expandedsolex];
 		];
 	,ProgressIndicator[j,{0,i-1}]];
 ];
