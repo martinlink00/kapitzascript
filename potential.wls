@@ -101,8 +101,8 @@ LogPrint["### NOW RUNNING SCRIPT ###","RUNNING"];PD[];
 (*SCRIPT*)
 
 LogPrint["Initiating.","PROGRESS"];
-\[Epsilon]max = 2 * highestcoeff + 3; (*Max collected \[Epsilon]*)
-highestpowercorr=Round[(\[Epsilon]max-2.1)/2]; (*Highest power correction*)
+\[Epsilon]max = 2 * highestcoeff + 2; (*Max collected \[Epsilon]*)
+highestpowercorr=highestcoeff; (*Highest power correction*)
 e[n_,t]:=Exp[I \[Omega] n t];
 \[CapitalPhi][n_]= \[Epsilon]^(Abs[n]) *Sum[\[Phi][n,m][t]\[Epsilon]^m,{m,0,\[Epsilon]max}];
 \[Delta]\[Theta]= Sum[If[n==0,0,e[n,t]\[CapitalPhi][n]],{n,-\[Epsilon]max,\[Epsilon]max}]; (*\[Delta]\[Theta] Ansatz*)
