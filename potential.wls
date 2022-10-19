@@ -157,7 +157,6 @@ For[i=1,i<\[Epsilon]max+1,i++,
 				];
 			];
 			LogPrint["Declaring algebraic solution of phi[+-"<>ToString[i-j]<>","<>ToString[j]<>"][t].","PRG:ALG"];
-			If[i-j==1&&j==15,solex>>"solex.txt";];
 			expandedsolex = Expand[solex];
 			\[Phi][i-j,j][t_] = expandedsolex;
 			\[Phi][-(i-j),j][t_] = (-1)^((i-j)+j) expandedsolex;
