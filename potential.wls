@@ -205,7 +205,7 @@ veffser = Series[D[Veff[z],z]/.z->\[CapitalPhi][0]/.oddphi0repl/.newnot/.\[Curly
 PD[];LogPrint["Acquiring derivative expressions from energy conservation.","PRG:ACC"];
 
 (*E0 = Sum[En[2m]\[Epsilon]^(2 m),{m,0,highestcoeff}];*)
-derrepleq = Table[Coefficient[D[\[CapitalPhi][0],t]^2,\[Epsilon],2 \[Epsilon]ord]==Coefficient[2(E0-Series[Veff[\[CapitalPhi][0]],{\[Epsilon],0,\[Epsilon]max}]),\[Epsilon],2 \[Epsilon]ord],{\[Epsilon]ord,0,highestcoeff}]/.oddphi0repl/.newnot; 
+derrepleq = Table[Coefficient[D[\[CapitalPhi][0],t]^2,\[Epsilon],2 \[Epsilon]ord]==Coefficient[2(-Series[Veff[\[CapitalPhi][0]],{\[Epsilon],0,\[Epsilon]max}]),\[Epsilon],2 \[Epsilon]ord],{\[Epsilon]ord,0,highestcoeff}]/.oddphi0repl/.newnot; 
 dertosolve = Table[\[CurlyPhi][2j]'[t],{j,0,highestcoeff}];
 derrepl = Simplify[Solve[derrepleq,dertosolve][[1]]];
 
