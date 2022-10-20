@@ -235,14 +235,16 @@ Monitor[
 
 PD[];LogPrint["Acquiring effective potential expressions.","PROGRESS"];
 LogPrint["Expanding acceleration expressions.","PRG:POT"];
-acc0list = acc0list/.\[CurlyPhi][0][t]->x;
+\[CurlyPhi][0][t] = x;
 DumpSave["acclist.mx",acc0list];
 ClearAll[acc0list];
 <<acclist.mx;
 
+
+
 LogPrint["Acquiring expressions for V_2m'[x].","PRG:POT"];
 
-irrelevantrepl = Table[\[CurlyPhi][2m][t]->0,{m,0,highestcoeff}];
+irrelevantrepl = Table[\[CurlyPhi][2m][t]->0,{m,1,highestcoeff}];
 vdashtable = Table[V[2m]'[x]==-acc0list[[m+1]]/.irrelevantrepl,{m,0,highestcoeff}];
 
 LogPrint["Applying Simplifications.","PRG:POT"];
